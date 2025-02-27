@@ -1,0 +1,6 @@
+name: "outline"
+instances {
+  id: "outline"
+  prototype: "/shaders/outline/outline.go"
+}
+scale_along_z: 0

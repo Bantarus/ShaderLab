@@ -1,0 +1,6 @@
+name: "dissolve"
+instances {
+  id: "dissolve"
+  prototype: "/shaders/dissolve/dissolve.go"
+}
+scale_along_z: 0

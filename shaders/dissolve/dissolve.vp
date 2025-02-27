@@ -1,0 +1,20 @@
+#version 330
+
+// Non-opaque uniforms in block (required for SPIR-V)
+uniform vx_uniforms
+{
+    mat4 view_proj;
+};
+
+// Inputs
+in vec4 position;
+in vec2 texcoord0;
+
+// Outputs to fragment shader
+out vec2 var_texcoord0;
+
+void main()
+{
+    gl_Position = view_proj * vec4(position.xyz, 1.0);
+    var_texcoord0 = texcoord0;
+} 

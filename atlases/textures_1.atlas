@@ -1,0 +1,4 @@
+images {
+  image: "/assets/textures/textures_1/energy_ball_sampler.png"
+}
+extrude_borders: 2

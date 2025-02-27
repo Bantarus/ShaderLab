@@ -1,0 +1,26 @@
+#version 330
+
+// Input attributes
+in vec4 position;
+in vec2 texcoord0;
+
+// Uniforms 
+uniform energy_ball_vp {
+    mat4 view_proj;
+};
+
+// Output to fragment shader
+out vec2 var_texcoord0;
+out vec2 var_frag_coord;
+
+void main()
+{
+    // Transform position
+    gl_Position = view_proj * vec4(position.xyz, 1.0);
+    
+    // Pass texture coordinates to fragment shader
+    var_texcoord0 = texcoord0;
+    
+    // Calculate fragment coordinates (similar to FragCoord in ShaderToy)
+    var_frag_coord = texcoord0;
+} 

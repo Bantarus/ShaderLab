@@ -1,0 +1,6 @@
+name: "highlight"
+instances {
+  id: "highlight"
+  prototype: "/shaders/highlight/highlight.go"
+}
+scale_along_z: 0

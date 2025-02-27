@@ -1,0 +1,42 @@
+-- Example function to toggle outline
+function toggle_outline(self, enable)
+    local settings = go.get("#sprite", "inner_outline_settings")
+    settings.x = enable and 1 or 0
+    print(settings.x)
+    go.set("#sprite", "inner_outline_settings", settings)
+end
+
+-- Example function to set outline color
+function set_outline_color(self, r, g, b, a)
+    go.set("#sprite", "inner_outline_color", vmath.vector4(r, g, b, a or 1))
+end
+
+-- Example function to set outline width
+function set_outline_width(self, width)
+    local settings = go.get("#sprite", "inner_outline_settings")
+    settings.y = width
+    go.set("#sprite", "inner_outline_settings", settings)
+end 
+
+
+function init(self)
+    -- Initialize shader properties
+    self.time = 0
+
+    toggle_outline(self, true)
+    
+    -- Make sure to set texture size based on the actual texture
+    local texture_info = resource.get_texture_info(go.get("#sprite", "texture0"))
+    if texture_info then
+        pprint(resource.get_texture_info(go.get("#sprite", "texture0")))
+        local texture_size = vmath.vector4(texture_info.width, texture_info.height, 0, 0)
+        go.set("#sprite", "texture_size_px", texture_size)
+    end
+end
+
+function update(self, dt)
+    -- Update time for animations
+    self.time = self.time + dt
+    go.set("#sprite", "time", vmath.vector4(self.time, 0, 0, 0))
+end
+

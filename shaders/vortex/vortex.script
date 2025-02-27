@@ -1,0 +1,100 @@
+-- vortex_card.lua
+-- This script handles the card's vortex effect when touched
+
+local function normalize_screen_position(x, y)
+	local window_width = sys.get_config_int("display.width")
+	local window_height = sys.get_config_int("display.height")
+	return x / window_width, y / window_height
+end
+
+function init(self)
+	-- Initialize state
+	self.touch_active = false
+	self.touch_position = vmath.vector3(0, 0, 0)
+	self.dissolve_amount = 0
+	self.card_original_position = go.get_position()
+	self.vortex_active = false
+
+	-- Initialize shader constants
+	go.set("#sprite", "vortex_color", vmath.vector4(0.4, 0.1, 0.9, 1.0))  -- Purple-ish
+	go.set("#sprite", "glow_color", vmath.vector4(0.9, 0.5, 1.0, 1.0))    -- Light purple/pink
+	go.set("#sprite", "vortex_strength", vmath.vector4(1.5))
+	go.set("#sprite", "vortex_radius", vmath.vector4(0.2))  -- 20% of the normalized space
+	go.set("#sprite", "dissolve_amount", vmath.vector4(0))
+
+	-- Start updating the time uniform for animation
+	self.time = 0
+end
+
+function update(self, dt)
+	-- Update time for shader animations
+	self.time = self.time + dt
+	go.set("#sprite", "time", vmath.vector4(self.time))
+
+	-- Handle dissolve animation when touch is active
+	if self.touch_active then
+		-- Gradually increase dissolve effect
+		self.dissolve_amount = math.min(self.dissolve_amount + dt * 2, 1.0)
+		go.set("#sprite", "dissolve_amount", vmath.vector4(self.dissolve_amount))
+
+		-- If fully dissolved, enable movement of the vortex
+		if self.dissolve_amount >= 1.0 and not self.vortex_active then
+			self.vortex_active = true
+			-- Visual feedback that card is fully absorbed
+			go.animate("#sprite", "vortex_radius", go.PLAYBACK_ONCE_FORWARD, 0.25, go.EASING_OUTBACK, 0.3)
+		end
+	else
+		-- Gradually reform the card
+		if self.dissolve_amount > 0 then
+			self.dissolve_amount = math.max(self.dissolve_amount - dt * 3, 0.0)
+			go.set("#sprite", "dissolve_amount", vmath.vector4(self.dissolve_amount))
+
+			-- If fully reformed, reset state
+			if self.dissolve_amount <= 0 and self.vortex_active then
+				self.vortex_active = false
+				-- Visual feedback that card has reformed
+				go.animate("#sprite", "vortex_radius", go.PLAYBACK_ONCE_FORWARD, 0.2, go.EASING_OUTBACK, 0.3)
+			end
+		end
+	end
+end
+
+function on_input(self, action_id, action)
+	if action_id == hash("touch") then
+		-- Convert screen coordinates to normalized coordinates
+		local norm_x, norm_y = normalize_screen_position(action.x, action.y)
+
+		if action.pressed then
+			-- Check if touch is on the card
+			--if gui.pick_node(gui.get_node("card_node"), action.x, action.y) then
+				self.touch_active = true
+				self.touch_position.x = norm_x
+				self.touch_position.y = norm_y
+				go.set("#sprite", "touch_position", vmath.vector4(norm_x, norm_y, 0, 0))
+			--end
+		elseif action.released then
+			-- Released touch
+			if self.touch_active then
+				self.touch_active = false
+				-- Move card to final position if vortex was active
+				if self.vortex_active then
+					-- Set final position where the touch was released
+					local world_pos = vmath.vector3(action.x, action.y, 0)
+					go.animate(".", "position", go.PLAYBACK_ONCE_FORWARD, world_pos, go.EASING_OUTQUAD, 0.3)
+				end
+			end
+		else
+			-- Update touch position for dragging
+			if self.touch_active and self.vortex_active then
+				self.touch_position.x = norm_x
+				self.touch_position.y = norm_y
+				go.set("#sprite", "touch_position", vmath.vector4(norm_x, norm_y, 0,0))
+
+				-- Move vortex to follow touch
+				local world_pos = vmath.vector3(action.x, action.y, 0)
+				go.set_position(world_pos)
+			end
+		end
+	end
+	return false
+end

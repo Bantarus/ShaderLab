@@ -1,0 +1,57 @@
+local function toggle_highlight(self, enabled)
+    if enabled and not self.is_highlighted then
+        print("Enabling highlight")
+        -- Enable highlight
+        go.set("#sprite", "highlight_color", self.highlight_color)
+        self.is_highlighted = true
+    elseif not enabled and self.is_highlighted then
+        print("Disabling highlight")
+        -- Disable highlight (set alpha to 0)
+        local disabled_color = vmath.vector4(
+            self.highlight_color.x,
+            self.highlight_color.y,
+            self.highlight_color.z,
+            0.0
+        )
+        go.set("#sprite", "highlight_color", disabled_color)
+        self.is_highlighted = false
+    end
+end
+
+function init(self)
+    -- Initialize default highlight parameters with more intense glow
+    self.highlight_color = vmath.vector4(0.1, 0.2, 1.0, 1.0)  -- Blue glow with full intensity
+    
+    -- Params: x = thickness (1000-5000 is a good range), y = glow size (1000-5000 is a good range)
+    self.params = vmath.vector4(5000.0, 5000.0, 1.0, 1.0)
+    
+    -- Apply initial values
+    go.set("#sprite", "highlight_color", self.highlight_color)
+    go.set("#sprite", "params", self.params)
+    
+    -- Initialize the highlighted state
+    self.is_highlighted = false
+    
+    -- Enable highlight by default
+    toggle_highlight(self, true)
+    
+    -- Debug output
+    print("Highlight shader initialized with thickness: " .. self.params.x)
+end
+
+function on_message(self, message_id, message, sender)
+    if message_id == hash("highlight") then
+        print("Received highlight message")
+        -- Enable highlight with optional custom color
+        if message.color then
+            self.highlight_color = message.color
+            go.set("#sprite", "highlight_color", self.highlight_color)
+        end
+        self:toggle_highlight(true)
+    elseif message_id == hash("unhighlight") then
+        print("Received unhighlight message")
+        -- Disable highlight
+        self:toggle_highlight(false)
+    end
+end
+

@@ -1,0 +1,6 @@
+name: "vortex"
+instances {
+  id: "vortex"
+  prototype: "/shaders/vortex/vortex.go"
+}
+scale_along_z: 0

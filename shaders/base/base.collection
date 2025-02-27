@@ -1,0 +1,6 @@
+name: "base"
+instances {
+  id: "base"
+  prototype: "/shaders/base/base.go"
+}
+scale_along_z: 0

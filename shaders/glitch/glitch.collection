@@ -1,0 +1,6 @@
+name: "glitch"
+instances {
+  id: "glitch"
+  prototype: "/shaders/glitch/glitch.go"
+}
+scale_along_z: 0

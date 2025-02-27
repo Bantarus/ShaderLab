@@ -1,0 +1,77 @@
+// SPIR-V requires a minimum GLSL version of 1.4,
+// probably because GLSL 1.4 corresponds to OpenGL 3.1,
+// which is when modern programmable pipeline features were introduced.
+// https://en.wikipedia.org/wiki/OpenGL_Shading_Language#Versions
+#version 330
+
+////////////////////////////////////////////////////////////////////////////////
+// Inputs
+////////////////////////////////////////////////////////////////////////////////
+
+// By default, Defold sprites receive `position` and `texcoord0` attributes.
+// Notice that we use `in` instead of `attribute` when specifying attributes.
+// I purposefully omit precision specifiers like `highp` for two reasons:
+// 1. I trust the compiler to choose a reasonable precision.
+// 2. I'm targeting PC, which uses OpenGL / Vulkan, not OpenGL ES.
+//    If you're targeting embedded devices, it might be smart to add a precision.
+in vec4 position;
+in vec2 texcoord0;
+
+// This is the custom `damage` attribute.
+in float damage;
+
+////////////////////////////////////////////////////////////////////////////////
+// Uniforms
+////////////////////////////////////////////////////////////////////////////////
+
+// GLSL differentiates between "opaque" and "non-opaque" uniforms.
+// Opaque in the dictionary means "non-transparent" or "you can't see through it".
+
+// Opaque uniforms are handles or pointers to some memory location on the GPU.
+// You can't "see through" these handles. You can't directly view or modify the data they point to.
+// An example is `sampler2D`, which requires the use of a function like `texture()` to access the underlying data.
+
+// Non-opaque uniforms however, you can "see through". You can directly access the data they reference.
+// An example is `mat4`, which can be directly multiplied, assigned a value, etc.
+
+// When writing SPIR-V GLSL, non-opaque uniforms must be wrapped in a "uniform block".
+// A uniform block is like a `namespace` in C++, to some extent. It simply groups data together.
+
+// Following these rules, I wrap the non-opaque `view_proj` matrix in a uniform block called `general_vp`, or "general vertex program".
+// Why this name? Two reasons:
+// 1. Its purpose is just to hold all non-opaque uniforms, regardless of context.
+// 2. Uniform blocks cannot have the same name across the vertex and fragment shaders.
+//    If  I wanted a similar block in the fragment shader, I'd differentiate it with a `_fp` suffix.
+uniform general_vp
+{
+    mat4 view_proj;
+};
+
+////////////////////////////////////////////////////////////////////////////////
+// Outputs
+////////////////////////////////////////////////////////////////////////////////
+
+// Outputs of a vertex shader are passed to the fragment shader.
+// Notice that we use `out` instead of `varying` when specifying outputs.
+out vec2 var_texcoord0;
+
+// This is the custom `damage` attribute that I want to pass to the fragment shader to create that red color effect.
+// Notice I use the `flat` keyword. This is called an "interpolation qualifier".
+// As you know, outputs are interpolated between vertices, hence the old `varying` keyword and Defold's `var_` naming convention.
+// I don't want my `damage` value to be interpolated.
+// As the fragment shader moves rightward across the brick, `damage` should remain its correct value.
+// After all, it wouldn't make sense for the damage of a character to change based on the position of its pixels. That would be really weird lol.
+// I therefore replace Defold's `var_` prefix with my own `flat_` prefix.
+flat out float flat_damage;
+
+////////////////////////////////////////////////////////////////////////////////
+// Functions
+////////////////////////////////////////////////////////////////////////////////
+
+void main()
+{
+    // When accessing `view_proj` from the uniform block, there is no need to specify the `general_vp` identifier.
+    gl_Position = view_proj * vec4(position.xyz, 1.0);
+    var_texcoord0 = texcoord0;
+    flat_damage = damage;
+}

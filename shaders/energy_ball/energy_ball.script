@@ -1,0 +1,29 @@
+local function update_shader(self, dt)
+	-- Update time
+	self.time = self.time + dt
+	go.set("#sprite", "time.x", self.time)
+
+	-- Other updates can be added here
+end
+
+function init(self)
+	-- Initialize time
+	self.time = 0
+
+	-- Set resolution
+	local width, height = window.get_size()
+	--go.set("#sprite", "resolution", vmath.vector4(width, height, 0, 0))
+end
+
+function update(self, dt)
+	update_shader(self, dt)
+end
+
+function on_message(self, message_id, message, sender)
+	-- Handle window resizing
+	if message_id == hash("window_resized") then
+		local width = message.width
+		local height = message.height
+		go.set("#sprite", "resolution", vmath.vector4(width, height, 0, 0))
+	end
+end 

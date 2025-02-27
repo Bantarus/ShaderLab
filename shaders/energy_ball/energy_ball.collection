@@ -1,0 +1,6 @@
+name: "energy_ball"
+instances {
+  id: "energy_ball"
+  prototype: "/shaders/energy_ball/energy_ball.go"
+}
+scale_along_z: 0

@@ -1,0 +1,60 @@
+function init(self)
+    -- Initialize properties
+    self.time = 0.0
+    self.glitch_intensity = 0.5
+    self.grayscale_amount = 0  -- Default grayscale amount
+    
+    -- Set initial shader values
+    go.set("#sprite", "time", vmath.vector4(self.time, 0, 0, 0))
+    go.set("#sprite", "glitch_intensity", vmath.vector4(self.glitch_intensity, 0, 0, 0))
+    go.set("#sprite", "rgb_shift", vmath.vector4(0.03, 0, 0, 0))
+    go.set("#sprite", "scan_line_jitter", vmath.vector4(0.01, 0, 0, 0))
+    go.set("#sprite", "vert_jitter", vmath.vector4(0.02, 0, 0, 0))
+    go.set("#sprite", "color_drift", vmath.vector4(0.3, 0, 0, 0))
+    go.set("#sprite", "grayscale_amount", vmath.vector4(self.grayscale_amount, 0, 0, 0))
+end
+
+function update(self, dt)
+       -- Update time for animated effects
+    self.time = self.time + dt 
+    go.set("#sprite", "time", vmath.vector4(self.time, 0, 0, 0))
+    
+    -- Optional: Make the glitch effects pulse over time for a more dynamic look
+  --  self.glitch_intensity = 0.3 + 0.2 * math.sin(self.time * 0.2)
+   -- go.set("#sprite", "glitch_intensity", vmath.vector4(self.glitch_intensity, 0, 0, 0))
+    
+    -- Optional: Make grayscale fluctuate slightly for a more unstable look
+    -- Uncomment to enable pulsing grayscale
+   -- self.grayscale_amount = 0.7 + 0.3 * math.sin(self.time * 0.1)
+   --  go.set("#sprite", "grayscale_amount", vmath.vector4(self.grayscale_amount, 0, 0, 0))
+end
+
+function on_message(self, message_id, message, sender)
+    if message_id == hash("set_glitch") then
+        -- Set glitch intensity
+        local intensity = message.intensity or 0.5
+        go.set("#sprite", "glitch_intensity", vmath.vector4(intensity, 0, 0, 0))
+    end
+
+    if message_id == hash("set_grayscale") then
+        -- Set grayscale amount
+        local amount = message.amount or 0.7
+        go.set("#sprite", "grayscale_amount", vmath.vector4(amount, 0, 0, 0))
+        self.grayscale_amount = amount
+    end
+    
+    if message_id == hash("pulse_glitch") then
+        -- Create a temporary pulse of glitch
+        local max_intensity = message.intensity or 0.8
+        local duration = message.duration or 0.5
+        
+        -- First, animate to max intensity
+        go.animate("#sprite", "glitch_intensity.x", go.PLAYBACK_ONCE_FORWARD, 
+                  max_intensity, go.EASING_INOUTQUAD, duration/2, 0, 
+                  function()
+                      -- Then, animate back to original intensity
+                      go.animate("#sprite", "glitch_intensity.x", go.PLAYBACK_ONCE_FORWARD, 
+                                self.glitch_intensity, go.EASING_INOUTQUAD, duration/2)
+                  end)
+    end
+end 

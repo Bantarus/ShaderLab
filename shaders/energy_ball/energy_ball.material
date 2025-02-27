@@ -1,0 +1,105 @@
+name: "energy_ball"
+tags: "tile"
+vertex_program: "/shaders/energy_ball/energy_ball.vp"
+fragment_program: "/shaders/energy_ball/energy_ball.fp"
+vertex_constants {
+  name: "view_proj"
+  type: CONSTANT_TYPE_VIEWPROJ
+}
+fragment_constants {
+  name: "resolution"
+  type: CONSTANT_TYPE_USER
+  value {
+    x: 1280.0
+    y: 720.0
+  }
+}
+fragment_constants {
+  name: "time"
+  type: CONSTANT_TYPE_USER
+  value {
+  }
+}
+fragment_constants {
+  name: "ball_params"
+  type: CONSTANT_TYPE_USER
+  value {
+    x: 0.0
+    y: 0.5
+    z: 0.0
+  }
+}
+fragment_constants {
+  name: "distortion"
+  type: CONSTANT_TYPE_USER
+  value {
+    x: 0.02
+    y: 0.02
+    z: 5.0
+  }
+}
+fragment_constants {
+  name: "scale"
+  type: CONSTANT_TYPE_USER
+  value {
+    x: 10.0
+    y: 10.0
+  }
+}
+fragment_constants {
+  name: "lightning_params1"
+  type: CONSTANT_TYPE_USER
+  value {
+    x: 75.0
+    y: 0.15
+    z: 0.15
+    w: 0.05
+  }
+}
+fragment_constants {
+  name: "lightning_params2"
+  type: CONSTANT_TYPE_USER
+  value {
+    x: 0.03
+    y: 0.02
+    z: 0.01
+    w: 1.0
+  }
+}
+fragment_constants {
+  name: "lightning_params3"
+  type: CONSTANT_TYPE_USER
+  value {
+    x: 6.0
+    y: 1.5
+    z: 0.5
+    w: 0.01
+  }
+}
+fragment_constants {
+  name: "lightning_params4"
+  type: CONSTANT_TYPE_USER
+  value {
+    x: 0.69
+    y: 20.0
+    z: 1.0
+    w: 7.0
+  }
+}
+fragment_constants {
+  name: "lightning_color"
+  type: CONSTANT_TYPE_USER
+  value {
+    x: 1.0
+    y: 0.9
+    z: 1.0
+    w: 0.8
+  }
+}
+samplers {
+  name: "texture_sampler0"
+  wrap_u: WRAP_MODE_REPEAT
+  wrap_v: WRAP_MODE_REPEAT
+  filter_min: FILTER_MODE_MIN_LINEAR
+  filter_mag: FILTER_MODE_MAG_LINEAR
+}

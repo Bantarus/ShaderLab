@@ -1,0 +1,75 @@
+function init(self)
+    -- Initialize properties
+    self.dissolve_amount = 0.0
+    self.time = 0.0
+    self.palette_offset = 0.0
+
+    -- Set initial shader values
+    go.set("#sprite", "dissolve_amount", vmath.vector4(self.dissolve_amount, 0, 0, 0))
+    go.set("#sprite", "edge_color", vmath.vector4(1.0, 1.0, 1.0, 1.0))  -- White edge glow
+    go.set("#sprite", "edge_width", vmath.vector4(0.3, 0, 0, 0))
+    go.set("#sprite", "noise_scale", vmath.vector4(15.0, 0, 0, 0))  -- Controls block size
+    go.set("#sprite", "time", vmath.vector4(self.time, 0, 0, 0))
+    go.set("#sprite", "palette_speed", vmath.vector4(0.1, 0, 0, 0))  -- Speed of color cycling
+    go.set("#sprite", "palette_offset", vmath.vector4(0.0, 0.33, 0.67,0))
+    go.set("#sprite", "palette_saturation", vmath.vector4(0.6, 0, 0, 0))  -- Vibrant colors
+
+    -- cyberpunk palette
+    local a = vmath.vector4(0.5, 0.5, 0.5,0); 
+    local b = vmath.vector4(0.6,0,0,0); 
+    local d = vmath.vector4(0.0, 0.33, 0.67,0);
+    -- ice palette
+    local a = vmath.vector4(0.5, 0.5, 0.5,0); 
+    local b = vmath.vector4(0.6,0,0,0); 
+    local d = vmath.vector4(0.0, 0.33, 0.67,0);
+
+    msg.post(".", "set_palette", {saturation = a, speed = b, offset = d})
+end
+
+function update(self, dt)
+    -- Update time for animated effects
+    self.time = self.time + dt
+    go.set("#sprite", "time", vmath.vector4(self.time, 0, 0, 0))
+
+    -- Slowly shift the palette over time for more variety
+    -- Comment this out if you want static color assignments per block
+   -- self.palette_offset = self.palette_offset + dt * 0.05
+   -- go.set("#sprite", "palette_offset", vmath.vector4(self.palette_offset, 0, 0, 0))
+
+    -- Uncomment to automatically animate the dissolve
+     self.dissolve_amount = (self.dissolve_amount + dt * 0.2) % 1.0
+    go.set("#sprite", "dissolve_amount", vmath.vector4(self.dissolve_amount, 0, 0, 0))
+end
+
+function on_message(self, message_id, message, sender)
+    if message_id == hash("dissolve") then
+        -- Example method to trigger dissolve effect
+        local target = message.target or 1.0  -- Fully dissolve by default
+        local duration = message.duration or 1.0
+
+        go.animate("#sprite", "dissolve_amount.x", go.PLAYBACK_ONCE_FORWARD, 
+        target, go.EASING_LINEAR, duration)
+    end
+
+    if message_id == hash("reset") then
+        -- Reset dissolve effect
+        go.animate("#sprite", "dissolve_amount.x", go.PLAYBACK_ONCE_FORWARD, 
+        0.0, go.EASING_LINEAR, message.duration or 1.0)
+    end
+
+    if message_id == hash("set_palette") then
+        -- Adjust palette parameters
+        if message.saturation then
+            go.set("#sprite", "palette_saturation", message.saturation)
+        end
+
+        if message.speed then
+            go.set("#sprite", "palette_speed", message.speed)
+        end
+
+        if message.offset then
+            self.palette_offset = message.offset
+            go.set("#sprite", "palette_offset", self.palette_offset)
+        end
+    end
+end 
