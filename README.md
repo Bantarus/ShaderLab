@@ -1,16 +1,3 @@
-<think>
-I'll create a comprehensive README.md file for the GitHub repository that explains the energy ball shader project. This should include:
-
-1. Overview of the project
-2. File structure and explanation
-3. Implementation details
-4. How to use the shader in a Defold project
-5. Customization options
-6. Credits/acknowledgments
-
-I'll make it visually appealing with proper Markdown formatting, including headers, code blocks, and possibly a table of contents.
-</think>
-
 # Defold Energy Ball Shader
 
 A high-quality energy ball shader implementation for the Defold game engine. This project provides a customizable, transparent energy ball effect with dynamic lightning and glow effects, perfect for magic spells, projectiles, or UI elements in your game.
@@ -203,7 +190,3 @@ You can include this library in your own shaders:
 ## License
 
 This project is available under the MIT License. See the LICENSE file for details.
-
----
-
-*Feel free to contribute improvements or report issues!*
